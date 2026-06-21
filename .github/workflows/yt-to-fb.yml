@@ -21,9 +21,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yt-dlp requests
-          sudo apt-get install -y ffmpeg nodejs npm
-          npm install -g @distube/ytdl-core
-      - name: Download Video
+          sudo apt-get install -y ffmpeg
+          curl -fsSL https://deno.land/install.sh | sh
+          echo "$HOME/.deno/bin" >> $GITHUB_PATH
+          - name: Download Video
         run: |
           yt-dlp -f "best[ext=mp4]/best" \
             --merge-output-format mp4 \
