@@ -27,9 +27,10 @@ jobs:
         run: |
           yt-dlp -f "best[ext=mp4]/best" \
             --merge-output-format mp4 \
+            --add-header "User-Agent:Mozilla/5.0" \
+            --no-check-certificate \
             -o "video.mp4" \
             "${{ github.event.inputs.youtube_url }}"
-
       - name: Apply Vintage Effect
         run: |
           ffmpeg -i video.mp4 \
