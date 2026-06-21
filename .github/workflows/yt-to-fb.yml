@@ -31,10 +31,15 @@ jobs:
 
       - name: Apply Vintage Effect
         run: |
-          ffmpeg -i video.mp4 \
-            -vf "curves=vintage,hue=s=0.7,vignette" \
-            -c:a copy video_vintage.mp4
+          ffmpeg -i video.mp4 -vf "curves=vintage,hue=s=0.7,vignette" -c:a copy video_vintage.mp4
 
+      - name: Upload to Facebook
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+          YOUTUBE_URL: ${{ github.event.inputs.youtube_url }}
+          CAPTION: ${{ github.event.inputs.caption }}
+        run: python upload_fb.py
       - name: Upload to Facebook
         env:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
