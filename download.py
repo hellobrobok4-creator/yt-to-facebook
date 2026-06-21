@@ -33,8 +33,7 @@ best = sorted(mp4_video, key=lambda x: int(x.get("qualityLabel", "0p").replace("
 download_url = best["url"]
 
 print(f"Quality: {best.get('qualityLabel')}")
-subprocess.run(["wget", "-O", "video.mp4", download_url], check=True)
-
+subprocess.run(["wget", "--no-check-certificate", "-O", "video.mp4", download_url], check=True)
 size = os.path.getsize("video.mp4")
 print(f"File size: {size} bytes")
 if size < 1000:
