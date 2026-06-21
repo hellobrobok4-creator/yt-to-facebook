@@ -24,7 +24,8 @@ jobs:
           sudo apt-get install -y ffmpeg
           curl -fsSL https://deno.land/install.sh | sh
           echo "$HOME/.deno/bin" >> $GITHUB_PATH
-          - name: Download Video
+
+      - name: Download Video
         run: |
           yt-dlp -f "best[ext=mp4]/best" \
             --merge-output-format mp4 \
