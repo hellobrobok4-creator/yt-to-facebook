@@ -20,19 +20,53 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pytubefix requests
+          pip install requests
           sudo apt-get install -y ffmpeg
 
       - name: Download Video
+        env:
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          YOUTUBE_URL: ${{ github.event.inputs.youtube_url }}
         run: |
-          python -c "
-          from pytubefix import YouTube
-          url = '${{ github.event.inputs.youtube_url }}'
-          yt = YouTube(url)
-          stream = yt.streams.get_highest_resolution()
-          stream.download(filename='video.mp4')
-          print('Downloaded:', yt.title)
-          "
+          python - <<'EOF'
+          import requests
+          import os
+          import re
+
+          url = os.environ["YOUTUBE_URL"]
+          video_id = re.search(r"(?:v=|shorts/)([a-zA-Z0-9_-]{11})", url)
+          if not video_id:
+              print("Invalid URL")
+              exit(1)
+          video_id = video_id.group(1)
+
+          headers = {
+              "X-RapidAPI-Key": os.environ["RAPIDAPI_KEY"],
+              "X-RapidAPI-Host": "yt-api.p.rapidapi.com"
+          }
+
+          res = requests.get(
+              f"https://yt-api.p.rapidapi.com/dl?id={video_id}",
+              headers=headers
+          ).json()
+
+          formats = res.get("formats", [])
+          mp4_formats = [f for f in formats if f.get("mimeType","").startswith("video/mp4") and f.get("url")]
+          
+          if not mp4_formats:
+              print("No MP4 format found")
+              exit(1)
+
+          best = sorted(mp4_formats, key=lambda x: int(x.get("qualityLabel","0p").replace("p","")), reverse=True)[0]
+          download_url = best["url"]
+
+          print(f"Downloading: {download_url[:50]}...")
+          r = requests.get(download_url, stream=True)
+          with open("video.mp4", "wb") as f:
+              for chunk in r.iter_content(chunk_size=8192):
+                  f.write(chunk)
+          print("Download complete!")
+          EOF
 
       - name: Apply Vintage Effect
         run: |
