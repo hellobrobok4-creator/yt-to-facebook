@@ -61,10 +61,12 @@ jobs:
           download_url = best["url"]
 
           print(f"Downloading: {download_url[:50]}...")
-          r = requests.get(download_url, stream=True)
-          with open("video.mp4", "wb") as f:
-              for chunk in r.iter_content(chunk_size=8192):
-                  f.write(chunk)
+          r = requests.get(download_url, stream=True, headers={"User-Agent": "Mozilla/5.0"})
+with open("video.mp4", "wb") as f:
+    for chunk in r.iter_content(chunk_size=8192):
+        if chunk:
+            f.write(chunk)
+print(f"File size: {os.path.getsize('video.mp4')} bytes")
           print("Download complete!")
           EOF
 
