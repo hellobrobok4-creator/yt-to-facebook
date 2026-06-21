@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yt-dlp requests
-          sudo apt-get install -y ffmpeg
-
+          sudo apt-get install -y ffmpeg nodejs npm
+          npm install -g @distube/ytdl-core
       - name: Download Video
         run: |
           yt-dlp -f "best[ext=mp4]/best" \
